@@ -1,0 +1,158 @@
+@import "tailwindcss";
+
+/* Las capturas de Stitch son referencia, no código de la app. */
+@source not "../.stitch";
+
+@theme {
+  /* Tema Velora (Rediseño nro 2 · Negro, Rojo y Blanco) */
+  --color-velora-black: #070709;
+  --color-velora-obsidian: #0d0d11;
+  --color-velora-charcoal: #14141a;
+  --color-velora-card: #111116;
+  --color-velora-ruby: #d91528;
+  --color-velora-crimson: #c41223;
+  --color-velora-red: #d91528;
+  --color-velora-border: rgba(255, 255, 255, 0.08);
+  --color-velora-border-subtle: rgba(255, 255, 255, 0.08);
+
+  /* Tokens heredados de pantallas de catálogo */
+  --color-casino-black: #08080a;
+  --color-casino-card: #111116;
+  --color-casino-surface: #15151e;
+  --color-casino-crimson: #dc2626;
+  --color-casino-scarlet: #e50914;
+  --color-casino-gold: #f59e0b;
+
+  --font-sans: "Inter", "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-cinzel: "Cinzel", "Playfair Display", ui-serif, Georgia, serif;
+  --font-display: "Cinzel", "Playfair Display", ui-serif, Georgia, serif;
+
+  --shadow-glow-red: 0 0 25px -4px rgba(217, 21, 40, 0.45);
+  --shadow-glow-sm: 0 0 12px -2px rgba(217, 21, 40, 0.35);
+  --shadow-inner-glow: inset 0 1px 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+@layer base {
+  html {
+    color-scheme: dark;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply min-h-screen bg-velora-black font-sans text-slate-200 antialiased;
+  }
+
+  ::selection {
+    @apply bg-velora-ruby text-white;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #09090d;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #22222b;
+    border-radius: 9999px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #d91528;
+  }
+}
+
+@layer components {
+  .subtle-glass {
+    background-color: rgba(7, 7, 9, 0.8);
+  }
+
+  .glass-panel {
+    background: rgba(17, 17, 22, 0.75);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+  }
+
+  .bg-casino-pattern {
+    background-color: #070709;
+    background-image:
+      radial-gradient(circle at 80% 0%, rgba(217, 21, 40, 0.1), transparent 45%),
+      linear-gradient(rgba(7, 7, 9, 0.62), rgba(7, 7, 9, 0.84)),
+      url("/fondoNormal.jpg");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+  }
+
+  .ruby-gradient-btn {
+    background: linear-gradient(135deg, #d91528 0%, #b30e1f 100%);
+    box-shadow: 0 4px 15px rgba(217, 21, 40, 0.35);
+  }
+
+  .ruby-gradient-btn:hover {
+    background: linear-gradient(135deg, #ef2437 0%, #d91528 100%);
+    box-shadow: 0 6px 20px rgba(217, 21, 40, 0.55);
+  }
+
+  .red-gradient-btn {
+    background: linear-gradient(135deg, #d91528 0%, #b30e1f 100%);
+    box-shadow: 0 4px 15px rgba(217, 21, 40, 0.35);
+  }
+
+  .red-gradient-btn:hover {
+    background: linear-gradient(135deg, #ef2437 0%, #d91528 100%);
+    box-shadow: 0 6px 20px rgba(217, 21, 40, 0.55);
+  }
+
+  .badge-count {
+    background: rgba(217, 21, 40, 0.15);
+    border: 1px solid rgba(217, 21, 40, 0.4);
+    color: #fca5a5;
+  }
+
+  .no-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .account-btn-primary {
+    @apply inline-flex cursor-pointer items-center justify-center gap-2 rounded-full px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-white;
+    background: linear-gradient(135deg, #d91528 0%, #b30e1f 100%);
+    box-shadow: 0 4px 15px rgba(217, 21, 40, 0.35);
+  }
+
+  .account-btn-primary:hover {
+    background: linear-gradient(135deg, #ef2437 0%, #d91528 100%);
+    box-shadow: 0 6px 20px rgba(217, 21, 40, 0.55);
+  }
+
+  .account-btn-secondary {
+    @apply inline-flex cursor-pointer items-center justify-center gap-2 rounded-full border border-white/10 px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-white transition-colors;
+    background-color: rgba(255, 255, 255, 0.03);
+  }
+
+  .account-btn-secondary:hover {
+    background-color: rgba(255, 255, 255, 0.07);
+  }
+
+  .account-press button,
+  .account-press a {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  @media (max-width: 1023px) {
+    .account-press button:active,
+    .account-press a:active {
+      transform: scale(0.95);
+      transition: transform 100ms ease;
+    }
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}

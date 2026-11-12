@@ -1,0 +1,119 @@
+{
+  "projectId": "3428674509965421959",
+  "resourceName": "projects/3428674509965421959",
+  "title": "Rediseño nro 2",
+  "url": "https://stitch.withgoogle.com/projects/3428674509965421959",
+  "deviceType": "DESKTOP",
+  "visibility": "PUBLIC",
+  "updatedAt": "2026-11-09T18:46:45.850619Z",
+  "screens": [
+    {
+      "id": "f5e2b059947a4300b2e67086474c5af1",
+      "title": "Home — Rediseño Premium Negro, Rojo y Blanco",
+      "width": 2560,
+      "height": 2048
+    },
+    {
+      "id": "b517839b930b49b2a5549de04eb9da24",
+      "title": "Home (variante sin promos)",
+      "width": 2560,
+      "height": 2048
+    },
+    {
+      "id": "a47767cc00a54c8eb5f7207ddab57f6a",
+      "title": "Velora Casino - Lobby Sofisticado",
+      "width": 2560,
+      "height": 3464
+    },
+    {
+      "id": "e78a05fd7a914175a8436c82fbed6034",
+      "title": "Velora Casino - Casino Live",
+      "width": 2560,
+      "height": 3812
+    },
+    {
+      "id": "251e2943c87142fab6aea9cc6b899df1",
+      "title": "Velora Casino - Poker",
+      "width": 2560,
+      "height": 2082
+    },
+    {
+      "id": "1a4dcf5e854346dbb2adef62adb5201d",
+      "title": "Velora Casino - Virtual",
+      "width": 2560,
+      "height": 2292
+    },
+    {
+      "id": "1994f78e2e2d400292126bc38a9b0440",
+      "title": "Velora Casino - Promotions",
+      "width": 2560,
+      "height": 2348
+    },
+    {
+      "id": "b700d4cb020c4cf785fd16ba80c644f0",
+      "title": "Velora Casino - Mensajes",
+      "width": 2560,
+      "height": 2048
+    },
+    {
+      "id": "1f778958a93343489bd43819e3e7f2fd",
+      "title": "Velora Casino - Account",
+      "width": 2560,
+      "height": 2508
+    },
+    {
+      "id": "73621e91463e4e84b01ed8cc0d06b8d8",
+      "title": "Velora Casino - Deposit",
+      "width": 2560,
+      "height": 3794
+    },
+    {
+      "id": "5611b403905f4e4885ab5e38d6cdd4e1",
+      "title": "Velora Casino - Withdrawal",
+      "width": 2560,
+      "height": 4696
+    },
+    {
+      "id": "7aef816b2b624e41a53aea5eb4ad2dbe",
+      "title": "Velora Casino - Transactions",
+      "width": 2560,
+      "height": 2724
+    },
+    {
+      "id": "df68320661794ffdafdaf9cb1bbe81a0",
+      "title": "Velora Casino - Account Verification (KYC)",
+      "width": 2560,
+      "height": 2180
+    },
+    {
+      "id": "0b9d857cf3e94b7285f32787787e928d",
+      "title": "Velora Casino - Responsible Gambling Limits",
+      "width": 2560,
+      "height": 2140
+    },
+    {
+      "id": "cee9565839b6404e985dd5b3675a2617",
+      "title": "Velora Casino - Personal Verification",
+      "width": 2560,
+      "height": 2512
+    },
+    {
+      "id": "294e218743f34f5fa2b628ddbd9a59da",
+      "title": "Velora Casino - Game",
+      "width": 2560,
+      "height": 2048
+    },
+    {
+      "id": "c5dea9ab3e174c1fa6e91ebbb6114bd4",
+      "title": "Velora Casino - Login",
+      "width": 2560,
+      "height": 2048
+    },
+    {
+      "id": "91cfcb7e2fe2415897282e78a801685e",
+      "title": "Velora Casino - Register",
+      "width": 2560,
+      "height": 2048
+    }
+  ]
+}
