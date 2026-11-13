@@ -126,8 +126,8 @@ function Game() {
             aria-pressed={favorite}
             className={
               favorite
-                ? 'flex h-10 w-10 items-center justify-center rounded-full border border-red-500/50 bg-red-950/30 text-red-500'
-                : 'flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.04] text-zinc-300 transition hover:text-white'
+                ? 'flex h-10 w-10 items-center justify-center rounded-full border border-red-500/50 bg-red-950/30 text-red-500 cursor-pointer'
+                : 'flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.04] text-zinc-300 transition hover:text-white cursor-pointer'
             }
           >
             <i className={`${favorite ? 'fa-solid' : 'fa-regular'} fa-heart text-sm`} aria-hidden="true" />
@@ -136,21 +136,21 @@ function Game() {
             type="button"
             onClick={toggleFullscreen}
             aria-label={isFullscreen ? t('Exit fullscreen') : t('Fullscreen')}
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.04] text-zinc-300 transition hover:text-white"
+            className="flex h-10 w-10 items-center justify-center rounded-full cursor-pointer border border-white/10 bg-white/[0.04] text-zinc-300 transition hover:text-white"
           >
             <i className={`fa-solid ${isFullscreen ? 'fa-compress' : 'fa-expand'} text-sm`} aria-hidden="true" />
           </button>
           <button
             type="button"
             aria-label={t('Help')}
-            className="hidden h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.04] text-zinc-300 transition hover:text-white lg:flex"
+            className="hidden h-10 w-10 items-center justify-center rounded-full cursor-pointer border border-white/10 bg-white/[0.04] text-zinc-300 transition hover:text-white lg:flex"
           >
             <i className="fa-regular fa-circle-question text-sm" aria-hidden="true" />
           </button>
           <button
             type="button"
             aria-label={t('Share')}
-            className="hidden h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.04] text-zinc-300 transition hover:text-white lg:flex"
+            className="hidden h-10 w-10 items-center justify-center rounded-full cursor-pointer border border-white/10 bg-white/[0.04] text-zinc-300 transition hover:text-white lg:flex"
           >
             <i className="fa-solid fa-share-nodes text-sm" aria-hidden="true" />
           </button>
