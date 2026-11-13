@@ -1,11 +1,31 @@
 ﻿import { useEffect, useRef, useState } from 'react'
 import { Link, useLocation, useParams } from 'react-router-dom'
 
-import GameTile from '../components/games/GameTile'
+import GameSection from '../components/home/GameSection'
 import { useGame } from '../hooks/useGame'
 import { useGames } from '../hooks/useGames'
 import { useLanguage } from '../i18n/LanguageContext'
 import { useLibrary } from '../library/LibraryContext'
+
+function BalancePill({ t, className = '' }) {
+  return (
+    <div
+      className={`flex items-center rounded-full border border-white/10 bg-[#101015] py-1 pl-2.5 pr-1 shadow-inner sm:pl-3.5 ${className}`}
+    >
+      <div className="mr-2 flex items-center space-x-1.5 sm:mr-3 sm:space-x-2">
+        <i className="fa-solid fa-wallet text-xs text-zinc-300" aria-hidden="true" />
+        <span className="whitespace-nowrap text-[11px] font-bold tracking-wide text-white sm:text-xs">0.00 €</span>
+      </div>
+      <Link
+        to="/account/deposit"
+        className="flex cursor-pointer items-center space-x-1 rounded-full bg-gradient-to-r from-[#d91528] to-[#b30e1f] px-2.5 py-1 text-[11px] font-bold text-white shadow-md shadow-red-950/60 transition-all duration-200 hover:brightness-110 sm:px-3 sm:text-xs"
+      >
+        <i className="fa-solid fa-plus text-[10px]" aria-hidden="true" />
+        <span>{t('Deposit')}</span>
+      </Link>
+    </div>
+  )
+}
 
 function Game() {
   const { id } = useParams()
@@ -19,9 +39,14 @@ function Game() {
   const { game: fetchedGame, loading, error, reload } = useGame(id)
   const game = fetchedGame ?? previewGame
   const favorite = game ? isFavorite(game.id) : false
-  const { games: providerGames } = useGames({
+  const {
+    games: providerGames,
+    loading: relatedLoading,
+    error: relatedError,
+    reload: reloadRelated,
+  } = useGames({
     brandId: game?.providerId,
-    perPage: 8,
+    perPage: 31,
     enabled: Boolean(game?.providerId),
   })
 
@@ -74,7 +99,7 @@ function Game() {
 
   const relatedGames = providerGames
     .filter((item) => item.id !== game.id)
-    .slice(0, 4)
+    .slice(0, 30)
 
   return (
     <div className="min-h-screen bg-casino-pattern text-white">
@@ -111,7 +136,7 @@ function Game() {
             type="button"
             onClick={toggleFullscreen}
             aria-label={isFullscreen ? t('Exit fullscreen') : t('Fullscreen')}
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.04] text-zinc-300 transition hover:text-white lg:hidden"
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.04] text-zinc-300 transition hover:text-white"
           >
             <i className={`fa-solid ${isFullscreen ? 'fa-compress' : 'fa-expand'} text-sm`} aria-hidden="true" />
           </button>
@@ -129,100 +154,78 @@ function Game() {
           >
             <i className="fa-solid fa-share-nodes text-sm" aria-hidden="true" />
           </button>
-          <Link
-            to="/account/deposit"
-            className="red-gradient-btn ml-1 hidden items-center gap-2 rounded-full px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-white lg:flex"
-          >
-            <i className="fa-solid fa-plus text-[10px]" aria-hidden="true" />
-            {t('Deposit')}
-          </Link>
+
+          <BalancePill t={t} className="ml-1 max-[349px]:hidden" />
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-[1600px] px-4 pb-16 lg:px-8">
-        <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
-          <div className="min-w-0">
-            <section
-              ref={playerRef}
-              className={`relative flex min-h-[420px] items-center justify-center overflow-hidden bg-black ${
-                isFullscreen ? 'rounded-none border-0' : 'rounded-2xl border border-white/10'
-              }`}
-            >
-              {game.image ? (
-                <img src={game.image} alt={game.name} className="absolute inset-0 h-full w-full object-cover" />
+      <main className="mx-auto w-full max-w-6xl px-4 pb-16 lg:px-8">
+        <section
+          ref={playerRef}
+          className={`relative mx-auto flex min-h-[420px] w-full items-center justify-center overflow-hidden bg-black sm:min-h-[480px] lg:min-h-[520px] xl:min-h-[640px] ${
+            isFullscreen ? 'rounded-none border-0' : 'rounded-2xl border border-white/10'
+          }`}
+        >
+          {game.image ? (
+            <img src={game.image} alt={game.name} className="absolute inset-0 h-full w-full object-cover" />
+          ) : (
+            <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#1b1b24] to-[#0d0d12] text-5xl font-black text-white/10">
+              {game.name.slice(0, 2).toUpperCase()}
+            </div>
+          )}
+
+          {(loading || error) && (
+            <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-black/60 px-4 text-center">
+              {error ? (
+                <>
+                  <i className="fa-solid fa-triangle-exclamation text-3xl text-[#d91528]" aria-hidden="true" />
+                  <p className="text-sm text-zinc-300">{t('Could not load games')}</p>
+                  <button type="button" onClick={reload} className="account-btn-secondary">
+                    {t('Try again')}
+                  </button>
+                </>
               ) : (
-                <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#1b1b24] to-[#0d0d12] text-5xl font-black text-white/10">
-                  {game.name.slice(0, 2).toUpperCase()}
-                </div>
+                <>
+                  <i className="fa-solid fa-spinner fa-spin text-3xl text-[#d91528]" aria-hidden="true" />
+                  <p className="text-sm text-zinc-400">{t('Loading...')}</p>
+                </>
               )}
-
-              {(loading || error) && (
-                <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-black/60 px-4 text-center">
-                  {error ? (
-                    <>
-                      <i className="fa-solid fa-triangle-exclamation text-3xl text-[#d91528]" aria-hidden="true" />
-                      <p className="text-sm text-zinc-300">{t('Could not load games')}</p>
-                      <button type="button" onClick={reload} className="account-btn-secondary">
-                        {t('Try again')}
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      <i className="fa-solid fa-spinner fa-spin text-3xl text-[#d91528]" aria-hidden="true" />
-                      <p className="text-sm text-zinc-400">{t('Loading...')}</p>
-                    </>
-                  )}
-                </div>
-              )}
-
-              {isFullscreen && (
-                <button
-                  type="button"
-                  onClick={toggleFullscreen}
-                  aria-label={t('Exit fullscreen')}
-                  className="absolute right-4 top-4 z-20 flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-black/60 text-white backdrop-blur-sm"
-                >
-                  <i className="fa-solid fa-compress text-sm" aria-hidden="true" />
-                </button>
-              )}
-            </section>
-
-            <div className="mt-4 lg:hidden">
-              <h1 className="text-lg font-bold text-white">{game.name}</h1>
-              <p className="mt-0.5 text-xs text-zinc-500">{game.provider}</p>
             </div>
-          </div>
+          )}
 
-          <aside className="space-y-4">
-            <div className="rounded-2xl border border-white/10 bg-[#0f1015] p-6">
-              <p className="text-[11px] font-bold uppercase tracking-widest text-zinc-400">{t('Balance')}</p>
-              <p className="mt-2 text-3xl font-black text-white">0 €</p>
-              <Link
-                to="/account/deposit"
-                className="red-gradient-btn mt-6 block w-full rounded-full px-5 py-3 text-center text-xs font-bold uppercase tracking-wider text-white"
-              >
-                {t('Deposit')}
-              </Link>
-            </div>
+          {isFullscreen && (
+            <button
+              type="button"
+              onClick={toggleFullscreen}
+              aria-label={t('Exit fullscreen')}
+              className="absolute right-4 top-4 z-20 flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-black/60 text-white backdrop-blur-sm"
+            >
+              <i className="fa-solid fa-compress text-sm" aria-hidden="true" />
+            </button>
+          )}
+        </section>
 
-            <div className="rounded-2xl border border-white/10 bg-[#0f1015] p-6">
-              <h2 className="text-sm font-bold text-white">{game.name}</h2>
-              <p className="mt-1 text-xs text-zinc-500">{game.provider}</p>
-            </div>
-          </aside>
+        <div className="mt-4 hidden justify-center max-[349px]:flex">
+          <BalancePill t={t} />
         </div>
 
-        {relatedGames.length > 0 && (
-          <section className="mt-10">
-            <h2 className="text-base font-bold text-white">
-              {t('More from')} {game.provider}
-            </h2>
-            <div className="mt-4 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 lg:gap-5">
-              {relatedGames.map((related) => (
-                <GameTile key={related.id} game={related} live={Boolean(related.live)} from={backTo} />
-              ))}
-            </div>
-          </section>
+        <div className="mt-4 lg:hidden">
+          <h1 className="text-lg font-bold text-white">{game.name}</h1>
+          <p className="mt-0.5 text-xs text-zinc-500">{game.provider}</p>
+        </div>
+
+        {(relatedGames.length > 0 || relatedLoading || relatedError) && (
+          <div className="mt-10">
+            <GameSection
+              title={`${t('More from')} ${game.provider}`}
+              games={relatedGames}
+              from={backTo}
+              loading={relatedLoading}
+              error={relatedError}
+              onRetry={reloadRelated}
+              emptyMessage="No related games are available right now."
+            />
+          </div>
         )}
       </main>
     </div>

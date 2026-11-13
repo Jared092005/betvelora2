@@ -16,6 +16,7 @@ function GameSection({
   error = null,
   onRetry,
   emptyMessage,
+  from,
 }) {
   const { t } = useLanguage()
   const scrollRef = useRef(null)
@@ -125,7 +126,7 @@ function GameSection({
                 key={game.id ?? `${game.name}-${index}`}
                 className="w-[calc(50%-0.5rem)] shrink-0 snap-start md:w-[calc(33.333%-0.667rem)] lg:w-[calc(25%-0.75rem)]"
               >
-                <GameTile game={game} live={game.live ?? live} />
+                <GameTile game={game} live={game.live ?? live} from={from} />
               </div>
             ))}
           </div>

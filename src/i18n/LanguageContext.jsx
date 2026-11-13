@@ -126,6 +126,7 @@ const dictionary = {
   'No new games are available right now.': 'No hay juegos nuevos disponibles por el momento.',
   'No virtual games are available right now.': 'No hay juegos virtuales disponibles por el momento.',
   'No poker games are available right now.': 'No hay juegos de póker disponibles por el momento.',
+  'No related games are available right now.': 'No hay juegos relacionados disponibles por el momento.',
   'Table Games': 'Juegos de mesa',
   Lobby: 'Lobby',
   'available games': 'juegos disponibles',
