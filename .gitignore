@@ -17,9 +17,6 @@ dist-ssr
 .env.example
 .env.*
 
-# Referencias de Stitch (solo se versiona .stitch/project.json)
-.stitch/screens/
-
 # Cachés y artefactos de pruebas
 .vite
 coverage

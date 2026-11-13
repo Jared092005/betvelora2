@@ -1,8 +1,5 @@
 @import "tailwindcss";
 
-/* Las capturas de Stitch son referencia, no código de la app. */
-@source not "../.stitch";
-
 @theme {
   /* Tema Velora (Rediseño nro 2 · Negro, Rojo y Blanco) */
   --color-velora-black: #070709;

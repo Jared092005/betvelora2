@@ -36,6 +36,8 @@ const dictionary = {
   'Top Winners of the Month': 'Ganadores del Mes',
   'Latest big wins distributed to lucky players': 'Últimas grandes victorias de jugadores afortunados',
   'View all': 'Ver todo',
+  'Previous games': 'Juegos anteriores',
+  'Next games': 'Juegos siguientes',
   Live: 'En vivo',
   LIVE: 'EN VIVO',
   Fresh: 'Nuevo',

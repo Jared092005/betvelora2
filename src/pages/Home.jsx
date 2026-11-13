@@ -44,12 +44,12 @@ const HOME_SECTIONS = [
 ]
 
 function HomeSection({ section }) {
-  const { games, loading, error, total, reload } = useGames({ ...section.source, perPage: 4 })
+  const { games, loading, error, total, reload } = useGames({ ...section.source, perPage: 30 })
 
   return (
     <GameSection
       {...section}
-      games={games.slice(0, 4)}
+      games={games}
       count={total ? total.toLocaleString('en-US') : undefined}
       loading={loading}
       error={error}
