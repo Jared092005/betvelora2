@@ -1,6 +1,7 @@
 ﻿import { useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 
+import { fetchGamesByBrand } from '../../api/games'
 import { useBrands } from '../../hooks/useBrands'
 import { useGames } from '../../hooks/useGames'
 import { useLanguage } from '../../i18n/LanguageContext'
@@ -32,6 +33,7 @@ function CatalogPage({
   perPage = 30,
   sidebar = {},
   sidebarElement,
+  completeCategory,
   live = false,
   aspect = 'aspect-[4/3]',
   favoriteSide = 'right',
@@ -72,11 +74,41 @@ function CatalogPage({
   const search = urlQuery.trim() || effectiveSource.search || ''
   const pageSize = activeFilter?.perPage ?? perPage
 
+  const complete = async () => {
+    if (!completeCategory) return []
+
+    const all = await fetchGamesByBrand(completeCategory)
+    const typeFilter = effectiveSource.type?.toLowerCase()
+    const brandFilter = brandId ? Number(brandId) : null
+    const searchTerm = search.trim().toLowerCase()
+
+    return all.filter((game) => {
+      if (brandFilter && game.providerId !== brandFilter) return false
+
+      if (typeFilter) {
+        const type = game.type?.toLowerCase() ?? ''
+        const matchesType =
+          type === typeFilter ||
+          (typeFilter === 'table_games' && (type === 'table' || type === 'table_games'))
+        if (!matchesType) return false
+      }
+
+      if (searchTerm) {
+        const haystack = `${game.name} ${game.provider} ${game.type}`.toLowerCase()
+        if (!haystack.includes(searchTerm)) return false
+      }
+
+      return true
+    })
+  }
+
   const { games, loading, error, total, hasMore, loadMore, reload } = useGames({
     ...effectiveSource,
     brandId: brandId || effectiveSource.brandId || undefined,
     search: search || undefined,
     perPage: pageSize,
+    apiPerPage: 100,
+    complete: completeCategory ? complete : undefined,
     enabled: !localList,
   })
 

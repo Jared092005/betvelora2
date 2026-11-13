@@ -90,6 +90,102 @@ export async function fetchBrands(category, { signal } = {}) {
   return items.map(normalizeBrand).filter(Boolean)
 }
 
+const CATEGORY_IDS = {
+  casino: 1,
+  casino_live: 2,
+  virtual: 3,
+  poker: 4,
+  crash: 5,
+}
+
+const brandGamesCache = new Map()
+
+async function mapWithConcurrency(items, limit, mapper) {
+  const results = new Array(items.length)
+  let index = 0
+  let failed = false
+
+  const worker = async () => {
+    while (index < items.length) {
+      const currentIndex = index
+      index += 1
+
+      try {
+        results[currentIndex] = await mapper(items[currentIndex])
+      } catch {
+        results[currentIndex] = []
+        failed = true
+      }
+    }
+  }
+
+  await Promise.all(
+    Array.from({ length: Math.min(limit, items.length) }, () => worker()),
+  )
+
+  return { results, failed }
+}
+
+async function requestBrandPage(brandId, page, signal) {
+  let lastError
+
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    try {
+      return await request(`/games/brand/${brandId}`, {
+        params: { page, per_page: 100 },
+        signal,
+      })
+    } catch (error) {
+      lastError = error
+      if (error?.name === 'AbortError') throw error
+      await new Promise((resolve) => setTimeout(resolve, 350))
+    }
+  }
+
+  throw lastError
+}
+
+export async function fetchGamesByBrand(category, { signal } = {}) {
+  const cacheKey = category ?? 'all'
+  if (brandGamesCache.has(cacheKey)) return brandGamesCache.get(cacheKey)
+
+  const brands = await fetchBrands(category, { signal })
+  const categoryId = CATEGORY_IDS[category]
+
+  const { results, failed } = await mapWithConcurrency(brands, 3, async (brand) => {
+    const games = []
+    let page = 1
+    let lastPage = 1
+
+    while (page <= lastPage) {
+      const message = await requestBrandPage(brand.id, page, signal)
+      const pageItems = Array.isArray(message) ? message : message?.items ?? []
+      games.push(...pageItems)
+      lastPage = message?.pagination?.last_page ?? 1
+      page += 1
+    }
+
+    await new Promise((resolve) => setTimeout(resolve, 100))
+    return games
+  })
+
+  const seen = new Set()
+  const items = []
+
+  for (const result of results) {
+    for (const raw of result) {
+      const game = normalizeGame(raw)
+      if (!game?.id || seen.has(game.id)) continue
+      if (categoryId && game.categoryId !== categoryId) continue
+      seen.add(game.id)
+      items.push(game)
+    }
+  }
+
+  if (!failed) brandGamesCache.set(cacheKey, items)
+  return items
+}
+
 export async function fetchGame(id, { signal } = {}) {
   const message = await request(`/games/${id}`, { signal })
   return normalizeGame(message)

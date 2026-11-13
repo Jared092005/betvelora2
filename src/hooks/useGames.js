@@ -13,7 +13,14 @@ function dedupeGames(items) {
 }
 
 function emptyGames(key) {
-  return { key, games: [], pagination: null, page: 1, error: null }
+  return {
+    key,
+    items: [],
+    pagination: null,
+    apiPage: 0,
+    displayCount: 0,
+    error: null,
+  }
 }
 
 export function useGames({
@@ -23,12 +30,24 @@ export function useGames({
   brandId,
   search,
   perPage = 24,
+  apiPerPage = perPage,
+  complete,
   enabled = true,
 } = {}) {
+  const fetchPageSize = Math.max(apiPerPage, perPage)
   const [state, setState] = useState(() => emptyGames(null))
   const [loadingMore, setLoadingMore] = useState(false)
   const [nonce, setNonce] = useState(0)
-  const requestKey = JSON.stringify([category, type, mode, brandId, search, perPage, nonce])
+  const requestKey = JSON.stringify([
+    category,
+    type,
+    mode,
+    brandId,
+    search,
+    perPage,
+    fetchPageSize,
+    nonce,
+  ])
 
   useEffect(() => {
     if (!enabled) return undefined
@@ -43,16 +62,19 @@ export function useGames({
       brandId,
       search,
       page: 1,
-      perPage,
+      perPage: fetchPageSize,
       signal: controller.signal,
     })
       .then((result) => {
         if (cancelled) return
+        const items = dedupeGames(result.items)
+
         setState({
           key: requestKey,
-          games: dedupeGames(result.items),
+          items,
           pagination: result.pagination,
-          page: 1,
+          apiPage: 1,
+          displayCount: Math.min(perPage, items.length),
           error: null,
         })
       })
@@ -60,9 +82,10 @@ export function useGames({
         if (cancelled || requestError?.name === 'AbortError') return
         setState({
           key: requestKey,
-          games: [],
+          items: [],
           pagination: null,
-          page: 1,
+          apiPage: 0,
+          displayCount: 0,
           error: requestError,
         })
       })
@@ -71,50 +94,73 @@ export function useGames({
       cancelled = true
       controller.abort()
     }
-  }, [requestKey, enabled, category, type, mode, brandId, search, perPage])
+  }, [requestKey, enabled, category, type, mode, brandId, search, perPage, fetchPageSize])
 
   const current = state.key === requestKey ? state : emptyGames(requestKey)
 
   const loadMore = useCallback(async () => {
-    if (loadingMore || !current.pagination || current.page >= current.pagination.last_page) return
+    if (loadingMore || !current.pagination) return
+
+    const targetCount = current.displayCount + perPage
+
+    if (current.items.length >= targetCount) {
+      setState((previous) =>
+        previous.key === requestKey
+          ? { ...previous, displayCount: Math.min(targetCount, previous.items.length) }
+          : previous,
+      )
+      return
+    }
 
     setLoadingMore(true)
 
     try {
-      const seen = new Set(current.games.map((game) => game.id))
-      const collected = []
-      let lastPagination = current.pagination
-      let pageToLoad = current.page + 1
+      const items = [...current.items]
+      const seen = new Set(items.map((game) => game.id))
+      let pagination = current.pagination
+      let apiPage = current.apiPage
       let attempts = 0
 
       while (
-        pageToLoad <= (lastPagination?.last_page ?? pageToLoad) &&
-        collected.length < perPage &&
-        attempts < 4
+        items.length < targetCount &&
+        apiPage < (pagination?.last_page ?? apiPage) &&
+        attempts < 6
       ) {
+        apiPage += 1
+
         const result = await fetchGames({
           category,
           type,
           mode,
           brandId,
           search,
-          page: pageToLoad,
-          perPage,
+          page: apiPage,
+          perPage: fetchPageSize,
         })
 
-        lastPagination = result.pagination ?? lastPagination
+        pagination = result.pagination ?? pagination
 
         for (const game of result.items) {
           if (!game?.id || seen.has(game.id)) continue
           seen.add(game.id)
-          collected.push(game)
-          if (collected.length >= perPage) break
+          items.push(game)
         }
 
-        pageToLoad += 1
         attempts += 1
+        if (result.items.length === 0) break
+      }
 
-        if (!result.pagination) break
+      const total = pagination?.total ?? items.length
+      const lastPage = pagination?.last_page ?? apiPage
+
+      if (items.length < total && apiPage >= lastPage && typeof complete === 'function') {
+        const completed = await complete()
+
+        for (const game of completed) {
+          if (!game?.id || seen.has(game.id)) continue
+          seen.add(game.id)
+          items.push(game)
+        }
       }
 
       setState((previous) => {
@@ -122,9 +168,10 @@ export function useGames({
 
         return {
           ...previous,
-          games: [...previous.games, ...collected],
-          pagination: lastPagination ?? previous.pagination,
-          page: Math.max(previous.page, pageToLoad - 1),
+          items,
+          pagination,
+          apiPage,
+          displayCount: Math.min(targetCount, items.length),
           error: null,
         }
       })
@@ -137,9 +184,10 @@ export function useGames({
     }
   }, [
     loadingMore,
-    current.games,
+    current.displayCount,
+    current.items,
     current.pagination,
-    current.page,
+    current.apiPage,
     requestKey,
     category,
     type,
@@ -147,17 +195,27 @@ export function useGames({
     brandId,
     search,
     perPage,
+    fetchPageSize,
+    complete,
   ])
 
   const reload = useCallback(() => setNonce((value) => value + 1), [])
 
+  const total = current.pagination?.total ?? current.items.length
+  const canComplete = typeof complete === 'function' && current.items.length < total
+  const hasMore =
+    enabled &&
+    (current.displayCount < current.items.length ||
+      current.apiPage < (current.pagination?.last_page ?? current.apiPage) ||
+      canComplete)
+
   return {
-    games: enabled ? current.games : [],
+    games: enabled ? current.items.slice(0, current.displayCount) : [],
     loading: enabled && (state.key !== requestKey || loadingMore),
     error: enabled ? current.error : null,
     pagination: enabled ? current.pagination : null,
-    total: enabled ? current.pagination?.total ?? current.games.length : 0,
-    hasMore: enabled && Boolean(current.pagination && current.page < current.pagination.last_page),
+    total: enabled ? current.pagination?.total ?? current.items.length : 0,
+    hasMore,
     loadMore,
     reload,
   }

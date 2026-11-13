@@ -21,6 +21,7 @@ function Casino() {
       filters={filters}
       source={{ category: 'casino' }}
       sidebar={{ brandCategory: 'casino' }}
+      completeCategory="casino"
       sidebarElement={(brands) => <CasinoSidebar brands={brands} />}
     />
   )
