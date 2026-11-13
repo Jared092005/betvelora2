@@ -65,7 +65,7 @@ function GameTile({ game, live = false, aspect = 'aspect-[4/3]', favoriteSide = 
             to={gamePath}
             state={{ from: returnTo }}
             onClick={openGame}
-            className="translate-y-2 cursor-pointer rounded-full bg-velora-red px-5 py-2 text-xs font-bold uppercase tracking-wider text-white shadow-lg shadow-red-900/40 transition-all hover:bg-velora-ruby/70 group-hover:translate-y-0 group-focus-within:translate-y-0"
+            className="translate-y-2 cursor-pointer rounded-full bg-velora-red px-5 py-2 text-xs font-bold uppercase tracking-wider text-white shadow-lg shadow-red-900/40 transition-all hover:bg-velora-ruby group-hover:translate-y-0 group-focus-within:translate-y-0"
           >
             {t('Play Now')}
           </Link>
