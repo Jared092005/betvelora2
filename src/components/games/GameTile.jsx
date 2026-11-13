@@ -30,14 +30,7 @@ function GameTile({ game, live = false, aspect = 'aspect-[4/3]', favoriteSide = 
       />
 
       <div className={`relative ${aspect} overflow-hidden rounded-2xl border border-white/[0.08] bg-[#181a20] shadow-md transition-all duration-300 group-hover:border-red-500/40 group-hover:shadow-[0_8px_20px_rgba(0,0,0,0.8)]`}>
-        {live && (
-          <div className="pointer-events-none absolute left-2.5 top-2.5 z-10 flex items-center rounded-full border border-red-500/30 bg-black/60 px-2.5 py-1 shadow-lg">
-            <span className="mr-1.5 h-2 w-2 animate-pulse rounded-full bg-velora-red shadow-[0_0_12px_rgba(229,9,20,0.6)]" />
-            <span className="text-[10px] font-extrabold uppercase leading-none tracking-widest text-white">
-              LIVE
-            </span>
-          </div>
-        )}
+        
         {game.image && !imageFailed ? (
           <img
             src={game.image}
