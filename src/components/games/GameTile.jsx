@@ -29,14 +29,22 @@ function GameTile({ game, live = false, aspect = 'aspect-[4/3]', favoriteSide = 
         className="absolute inset-0 z-[5] lg:hidden"
       />
 
-      <div className={`relative ${aspect} overflow-hidden bg-[#16161d]`}>
+      <div className={`relative ${aspect} overflow-hidden rounded-2xl border border-white/[0.08] bg-[#181a20] shadow-md transition-all duration-300 group-hover:border-red-500/40 group-hover:shadow-[0_8px_20px_rgba(0,0,0,0.8)]`}>
+        {live && (
+          <div className="pointer-events-none absolute left-2.5 top-2.5 z-10 flex items-center rounded-full border border-red-500/30 bg-black/60 px-2.5 py-1 shadow-lg">
+            <span className="mr-1.5 h-2 w-2 animate-pulse rounded-full bg-velora-red shadow-[0_0_12px_rgba(229,9,20,0.6)]" />
+            <span className="text-[10px] font-extrabold uppercase leading-none tracking-widest text-white">
+              LIVE
+            </span>
+          </div>
+        )}
         {game.image && !imageFailed ? (
           <img
             src={game.image}
             alt={game.name}
             loading="lazy"
             onError={() => setImageFailed(true)}
-            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+            className="h-full w-full object-cover transition-[scale] duration-500 group-hover:scale-105"
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#1b1b24] to-[#0d0d12] text-2xl font-black text-white/20">
@@ -52,12 +60,12 @@ function GameTile({ game, live = false, aspect = 'aspect-[4/3]', favoriteSide = 
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[#111116] via-transparent to-transparent opacity-80" />
 
-        <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center bg-black/50 opacity-0 backdrop-blur-sm transition-opacity duration-200 group-hover:pointer-events-auto group-hover:opacity-100">
+        <div className="game-card-overlay pointer-events-none absolute inset-0 z-10 hidden flex-col items-center justify-center gap-2 bg-black/60 p-3 opacity-0 transition-all duration-300 group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100 lg:flex">
           <Link
             to={gamePath}
             state={{ from: returnTo }}
             onClick={openGame}
-            className="cursor-pointer rounded-lg bg-[#d91528] px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-white shadow-lg shadow-red-950/50 transition-colors hover:bg-[#bd1122]"
+            className="translate-y-2 cursor-pointer rounded-full bg-velora-red px-5 py-2 text-xs font-bold uppercase tracking-wider text-white shadow-lg shadow-red-900/40 transition-all hover:bg-velora-ruby/70 group-hover:translate-y-0 group-focus-within:translate-y-0"
           >
             {t('Play Now')}
           </Link>
@@ -69,7 +77,7 @@ function GameTile({ game, live = false, aspect = 'aspect-[4/3]', favoriteSide = 
           aria-label={favorite ? `Quitar ${game.name} de favoritos` : `Añadir ${game.name} a favoritos`}
           aria-pressed={favorite}
           className={[
-            'absolute top-2.5 z-20 flex h-7 w-7 cursor-pointer items-center justify-center rounded-full border bg-black/60 backdrop-blur-md transition',
+            'absolute top-2.5 z-20 flex h-7 w-7 cursor-pointer items-center justify-center rounded-full border bg-black/60 transition',
             resolvedFavoriteSide === 'left' ? 'left-2.5' : 'right-2.5',
             favorite
               ? 'border-red-500/50 text-red-500'
