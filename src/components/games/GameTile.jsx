@@ -23,7 +23,7 @@ function GameTile({ game, live = false, aspect = 'aspect-[4/3]', favoriteSide = 
     >
       <Link
         to={gamePath}
-        state={{ from: returnTo }}
+        state={{ from: returnTo, game }}
         onClick={openGame}
         aria-label={`${t('View game')} ${game.name}`}
         className="absolute inset-0 z-[5] lg:hidden"
@@ -46,7 +46,7 @@ function GameTile({ game, live = false, aspect = 'aspect-[4/3]', favoriteSide = 
         )}
         <Link
           to={gamePath}
-          state={{ from: returnTo }}
+          state={{ from: returnTo, game }}
           onClick={openGame}
           aria-label={`${t('View game')} ${game.name}`}
           className="absolute inset-0 z-0"
@@ -56,7 +56,7 @@ function GameTile({ game, live = false, aspect = 'aspect-[4/3]', favoriteSide = 
         <div className="game-card-overlay pointer-events-none absolute inset-0 z-10 hidden flex-col items-center justify-center gap-2 bg-black/60 p-3 opacity-0 transition-all duration-300 group-hover:pointer-events-auto group-hover:opacity-100 group-has-[a:focus-visible]:pointer-events-auto group-has-[a:focus-visible]:opacity-100 lg:flex">
           <Link
             to={gamePath}
-            state={{ from: returnTo }}
+            state={{ from: returnTo, game }}
             onClick={openGame}
             className="translate-y-2 cursor-pointer rounded-full bg-velora-red px-5 py-2 text-xs font-bold uppercase tracking-wider text-white shadow-lg shadow-red-900/40 transition-all hover:bg-velora-ruby group-hover:translate-y-0 group-has-[a:focus-visible]:translate-y-0"
           >

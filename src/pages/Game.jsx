@@ -13,9 +13,11 @@ function Game() {
   const { t } = useLanguage()
   const { isFavorite, toggleFavorite } = useLibrary()
   const backTo = location.state?.from || '/casino'
+  const previewGame = location.state?.game ?? null
   const [isFullscreen, setIsFullscreen] = useState(false)
   const playerRef = useRef(null)
-  const { game, loading, error, reload } = useGame(id)
+  const { game: fetchedGame, loading, error, reload } = useGame(id)
+  const game = fetchedGame ?? previewGame
   const favorite = game ? isFavorite(game.id) : false
   const { games: providerGames } = useGames({
     brandId: game?.providerId,
@@ -43,7 +45,7 @@ function Game() {
     }
   }
 
-  if (loading) {
+  if (loading && !game) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-casino-pattern px-6 text-center text-white">
         <i className="fa-solid fa-spinner fa-spin text-3xl text-[#d91528]" aria-hidden="true" />
@@ -52,7 +54,7 @@ function Game() {
     )
   }
 
-  if (error || !game) {
+  if (!game) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-casino-pattern px-6 text-center text-white">
         <i className="fa-solid fa-gamepad text-4xl text-zinc-600" aria-hidden="true" />
@@ -151,6 +153,25 @@ function Game() {
               ) : (
                 <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#1b1b24] to-[#0d0d12] text-5xl font-black text-white/10">
                   {game.name.slice(0, 2).toUpperCase()}
+                </div>
+              )}
+
+              {(loading || error) && (
+                <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-black/60 px-4 text-center">
+                  {error ? (
+                    <>
+                      <i className="fa-solid fa-triangle-exclamation text-3xl text-[#d91528]" aria-hidden="true" />
+                      <p className="text-sm text-zinc-300">{t('Could not load games')}</p>
+                      <button type="button" onClick={reload} className="account-btn-secondary">
+                        {t('Try again')}
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <i className="fa-solid fa-spinner fa-spin text-3xl text-[#d91528]" aria-hidden="true" />
+                      <p className="text-sm text-zinc-400">{t('Loading...')}</p>
+                    </>
+                  )}
                 </div>
               )}
 
