@@ -79,9 +79,8 @@ function Home() {
 
       <main className="min-w-0 flex-1 overflow-y-auto px-6 py-6 lg:px-8" data-purpose="game-catalog">
         <div className="mx-auto max-w-7xl space-y-7">
-          
-
           <HomePromos />
+          <HomeMobileFilters />
           <section data-purpose="global-search-container">
             <div className="relative w-full shadow-lg">
               <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-zinc-400">
@@ -100,8 +99,6 @@ function Home() {
               />
             </div>
           </section>
-          <HomeMobileFilters />
-
           {searching ? (
             <GameSection
               title="Search Results"
