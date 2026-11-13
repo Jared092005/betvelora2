@@ -91,7 +91,7 @@ function Home() {
               </div>
               <input
                 className="w-full rounded-full border border-white/10 bg-[#101016]/90 py-2.5 pl-11 pr-5 text-sm text-zinc-100 placeholder-zinc-500 backdrop-blur-md transition duration-200 focus:border-[#d91528] focus:outline-none focus:ring-1 focus:ring-[#d91528]"
-                placeholder={t('Search games, live dealers, providers...')}
+                placeholder={t('Search games')}
                 type="search"
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}

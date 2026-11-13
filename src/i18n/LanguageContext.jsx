@@ -27,7 +27,7 @@ const dictionary = {
   'Search game...': 'Buscar juego...',
   'Search live table...': 'Buscar mesa en vivo...',
   'Search crash games...': 'Buscar crash games...',
-  'Search games, live dealers, providers...': 'Buscar juegos, dealers en vivo, proveedores...',
+  'Search games': 'Buscar juegos',
   Categories: 'Categorías',
   Providers: 'Proveedores',
   Betting: 'Apuestas',
