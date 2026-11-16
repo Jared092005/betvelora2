@@ -1,3 +1,5 @@
+export const CASINO_GAME_TOTAL = 538
+
 export const mainNav = [
   { label: 'Home', to: '/', end: true, icon: 'fa-solid fa-house' },
   { label: 'Casino', to: '/casino', icon: 'fa-solid fa-dice' },

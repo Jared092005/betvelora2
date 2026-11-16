@@ -34,6 +34,7 @@ function CatalogPage({
   sidebar = {},
   sidebarElement,
   completeCategory,
+  totalOverride,
   live = false,
   aspect = 'aspect-[4/3]',
   favoriteSide = 'right',
@@ -157,9 +158,10 @@ function CatalogPage({
         ? 'Games you open will appear here.'
         : emptyMessage
 
+  const displayTotal = totalOverride ?? total
   const resultsLabel =
-    !isLocal && total > 0
-      ? `Showing ${shownGames.length} of ${total} available games`
+    !isLocal && displayTotal > 0
+      ? `Showing ${shownGames.length} of ${displayTotal} available games`
       : null
 
   const setFilterKey = (key) => {

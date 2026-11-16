@@ -129,7 +129,7 @@ function CatalogSidebar({
             {!activeBrand && <i className="fa-solid fa-check text-[10px] text-red-400" aria-hidden="true" />}
           </button>
 
-          <div className="space-y-1 text-xs font-semibold text-zinc-400">
+          <div className="max-h-64 space-y-1 overflow-y-auto overscroll-contain pr-1 text-xs font-semibold text-zinc-400">
             {brands.map((brand) => {
               const active = String(brand.id) === activeBrand
 

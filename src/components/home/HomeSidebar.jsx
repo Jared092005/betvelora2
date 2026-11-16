@@ -59,7 +59,7 @@ function HomeSidebar() {
             />
           </div>
 
-          <div className="space-y-1 px-1 pt-1">
+          <div className="max-h-64 space-y-1 overflow-y-auto overscroll-contain pb-1 pl-1 pr-2 pt-1">
             {loading &&
               Array.from({ length: 6 }).map((_, index) => (
                 <div key={index} className="flex items-center gap-2.5 px-2 py-2">

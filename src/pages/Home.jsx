@@ -4,6 +4,7 @@ import GameSection from '../components/home/GameSection'
 import HomeMobileFilters from '../components/home/HomeMobileFilters'
 import HomePromos from '../components/home/HomePromos'
 import HomeSidebar from '../components/home/HomeSidebar'
+import { CASINO_GAME_TOTAL } from '../config/navigation'
 import { useDebouncedValue } from '../hooks/useDebouncedValue'
 import { useGameSearch, useGames } from '../hooks/useGames'
 import { useLanguage } from '../i18n/LanguageContext'
@@ -43,9 +44,7 @@ const HOME_SECTIONS = [
   },
 ]
 
-function HomeSection({ section }) {
-  const { games, loading, error, total, reload } = useGames({ ...section.source, perPage: 30 })
-
+function HomeSection({ section, games, loading, error, total, reload }) {
   return (
     <GameSection
       {...section}
@@ -69,6 +68,20 @@ function Home() {
     error: searchError,
     reload: reloadSearch,
   } = useGameSearch(debouncedTerm, { perPage: 4 })
+
+  const slots = useGames({ ...HOME_SECTIONS[0].source, perPage: 30 })
+  const crash = useGames({ ...HOME_SECTIONS[1].source, perPage: 30 })
+  const live = useGames({ ...HOME_SECTIONS[2].source, perPage: 30 })
+  const newGames = useGames({ ...HOME_SECTIONS[3].source, perPage: 100 })
+
+  const seenIds = new Set()
+  slots.games.forEach((game) => seenIds.add(game.id))
+  crash.games.forEach((game) => seenIds.add(game.id))
+  live.games.forEach((game) => seenIds.add(game.id))
+
+  const newGamesFiltered = newGames.games
+    .filter((game) => !seenIds.has(game.id))
+    .slice(0, 30)
 
   const searching = term.length > 0
   const searchPending = searching && (debouncedTerm !== term || searchLoading)
@@ -111,7 +124,23 @@ function Home() {
               emptyMessage="Try another name, category or provider."
             />
           ) : (
-            HOME_SECTIONS.map((section) => <HomeSection key={section.id} section={section} />)
+            <>
+              <HomeSection
+                key={HOME_SECTIONS[0].id}
+                section={HOME_SECTIONS[0]}
+                {...slots}
+                total={CASINO_GAME_TOTAL}
+              />
+              <HomeSection key={HOME_SECTIONS[1].id} section={HOME_SECTIONS[1]} {...crash} />
+              <HomeSection key={HOME_SECTIONS[2].id} section={HOME_SECTIONS[2]} {...live} />
+              <HomeSection
+                key={HOME_SECTIONS[3].id}
+                section={HOME_SECTIONS[3]}
+                {...newGames}
+                games={newGamesFiltered}
+                total={CASINO_GAME_TOTAL}
+              />
+            </>
           )}
         </div>
       </main>

@@ -1,8 +1,7 @@
 import { Link, useLocation, useSearchParams } from 'react-router-dom'
 
-import { sidebarNav } from '../../config/navigation'
+import { CASINO_GAME_TOTAL, sidebarNav } from '../../config/navigation'
 import { useBrands } from '../../hooks/useBrands'
-import { useGames } from '../../hooks/useGames'
 import { useLanguage } from '../../i18n/LanguageContext'
 
 const itemClass = (active) =>
@@ -25,7 +24,7 @@ function CasinoSidebar({ brands: providedBrands }) {
   const hasBrandsProp = Array.isArray(providedBrands)
   const { brands: fetchedBrands } = useBrands('casino', { enabled: !hasBrandsProp })
   const brands = hasBrandsProp ? providedBrands : fetchedBrands
-  const { total } = useGames({ category: 'casino', perPage: 1 })
+  const total = CASINO_GAME_TOTAL
   const items = sidebarNav.map((item) =>
     item.label === 'Lobby' ? { ...item, to: '/casino' } : item,
   )
@@ -105,7 +104,7 @@ function CasinoSidebar({ brands: providedBrands }) {
           {!activeBrand && <i className="fa-solid fa-check text-[10px] text-red-400" aria-hidden="true" />}
         </Link>
 
-        <div className="space-y-1 text-xs font-semibold text-zinc-400">
+        <div className="max-h-64 space-y-1 overflow-y-auto overscroll-contain pr-1 text-xs font-semibold text-zinc-400">
           {brands.map((brand) => {
             const active = String(brand.id) === activeBrand
 
