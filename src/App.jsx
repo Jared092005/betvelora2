@@ -16,11 +16,12 @@ import Casino from './pages/Casino'
 import CasinoLive from './pages/CasinoLive'
 import CrashGames from './pages/CrashGames'
 import Home from './pages/Home'
-import Login from './pages/Login'
 import NotFound from './pages/NotFound'
 import Poker from './pages/Poker'
 import Promotions from './pages/Promotions'
-import Register from './pages/Register'
+import Login from './pages/auth/Login'
+import Register from './pages/auth/Register'
+import ResetPassword from './pages/auth/ResetPassword'
 import Virtual from './pages/Virtual'
 
 function App() {
@@ -50,6 +51,7 @@ function App() {
       <Route path="games/:id" element={<Game />} />
       <Route path="login" element={<Login />} />
       <Route path="register" element={<Register />} />
+      <Route path="reset-password" element={<ResetPassword />} />
     </Routes>
   )
 }

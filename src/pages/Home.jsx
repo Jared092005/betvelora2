@@ -4,7 +4,6 @@ import GameSection from '../components/home/GameSection'
 import HomeMobileFilters from '../components/home/HomeMobileFilters'
 import HomePromos from '../components/home/HomePromos'
 import HomeSidebar from '../components/home/HomeSidebar'
-import { CASINO_GAME_TOTAL } from '../config/navigation'
 import { useDebouncedValue } from '../hooks/useDebouncedValue'
 import { useGameSearch, useGames } from '../hooks/useGames'
 import { useLanguage } from '../i18n/LanguageContext'
@@ -44,12 +43,11 @@ const HOME_SECTIONS = [
   },
 ]
 
-function HomeSection({ section, games, loading, error, total, reload }) {
+function HomeSection({ section, games, loading, error, reload }) {
   return (
     <GameSection
       {...section}
       games={games}
-      count={total ? total.toLocaleString('en-US') : undefined}
       loading={loading}
       error={error}
       onRetry={reload}
@@ -67,12 +65,12 @@ function Home() {
     loading: searchLoading,
     error: searchError,
     reload: reloadSearch,
-  } = useGameSearch(debouncedTerm, { perPage: 4 })
+  } = useGameSearch(debouncedTerm, { perPage: 24 })
 
-  const slots = useGames({ ...HOME_SECTIONS[0].source, perPage: 30 })
-  const crash = useGames({ ...HOME_SECTIONS[1].source, perPage: 30 })
-  const live = useGames({ ...HOME_SECTIONS[2].source, perPage: 30 })
-  const newGames = useGames({ ...HOME_SECTIONS[3].source, perPage: 100 })
+  const slots = useGames({ ...HOME_SECTIONS[0].source, perPage: 24 })
+  const crash = useGames({ ...HOME_SECTIONS[1].source, perPage: 24 })
+  const live = useGames({ ...HOME_SECTIONS[2].source, perPage: 24 })
+  const newGames = useGames({ ...HOME_SECTIONS[3].source, perPage: 60 })
 
   const seenIds = new Set()
   slots.games.forEach((game) => seenIds.add(game.id))
@@ -81,7 +79,7 @@ function Home() {
 
   const newGamesFiltered = newGames.games
     .filter((game) => !seenIds.has(game.id))
-    .slice(0, 30)
+    .slice(0, 24)
 
   const searching = term.length > 0
   const searchPending = searching && (debouncedTerm !== term || searchLoading)
@@ -115,9 +113,8 @@ function Home() {
           {searching ? (
             <GameSection
               title="Search Results"
-              count={searchPending || searchError ? undefined : `${results.length}`}
               viewAll="/casino"
-              games={searchPending ? [] : results}
+              games={searchPending ? [] : results.slice(0, 24)}
               loading={searchPending}
               error={searchError}
               onRetry={reloadSearch}
@@ -125,12 +122,7 @@ function Home() {
             />
           ) : (
             <>
-              <HomeSection
-                key={HOME_SECTIONS[0].id}
-                section={HOME_SECTIONS[0]}
-                {...slots}
-                total={CASINO_GAME_TOTAL}
-              />
+              <HomeSection key={HOME_SECTIONS[0].id} section={HOME_SECTIONS[0]} {...slots} />
               <HomeSection key={HOME_SECTIONS[1].id} section={HOME_SECTIONS[1]} {...crash} />
               <HomeSection key={HOME_SECTIONS[2].id} section={HOME_SECTIONS[2]} {...live} />
               <HomeSection
@@ -138,7 +130,6 @@ function Home() {
                 section={HOME_SECTIONS[3]}
                 {...newGames}
                 games={newGamesFiltered}
-                total={CASINO_GAME_TOTAL}
               />
             </>
           )}

@@ -1,10 +1,15 @@
 import { useEffect, useState } from 'react'
 
-import { fetchBrands } from '../api/games'
+import { fetchBrands, peekBrands } from '../api/games'
 
 export function useBrands(category, { enabled = true } = {}) {
-  const [state, setState] = useState({ key: null, brands: [], error: null })
   const requestKey = JSON.stringify([category ?? 'all', enabled])
+  const cachedBrands = enabled ? peekBrands(category) : null
+  const [state, setState] = useState(() =>
+    cachedBrands
+      ? { key: requestKey, brands: cachedBrands, error: null }
+      : { key: null, brands: [], error: null },
+  )
 
   useEffect(() => {
     if (!enabled) return undefined

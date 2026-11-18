@@ -16,9 +16,67 @@
       rel="stylesheet"
     />
     <title>VELORA CASINO | High-End Luxury Gaming</title>
+    <style>
+      .app-splash {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #050506;
+        transition: opacity 350ms ease, visibility 350ms ease;
+      }
+
+      .app-splash__content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 2.5rem;
+      }
+
+      .app-splash__logo {
+        width: 11rem;
+        height: auto;
+      }
+
+      .app-splash__ring {
+        width: 2.5rem;
+        height: 2.5rem;
+        border-radius: 9999px;
+        border: 2px solid rgba(217, 21, 40, 0.22);
+        border-top-color: #d91528;
+        animation: app-splash-spin 800ms linear infinite;
+      }
+
+      .app-splash--hidden {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+      }
+
+      @keyframes app-splash-spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .app-splash__ring {
+          animation-duration: 1800ms;
+        }
+      }
+    </style>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <div class="app-splash" aria-hidden="true">
+        <div class="app-splash__content">
+          <img src="/logoBetVelora.png" alt="Velora Casino" class="app-splash__logo" />
+          <span class="app-splash__ring"></span>
+        </div>
+      </div>
+    </div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

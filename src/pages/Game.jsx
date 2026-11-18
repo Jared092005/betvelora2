@@ -2,6 +2,7 @@
 import { Link, useLocation, useParams } from 'react-router-dom'
 
 import GameSection from '../components/home/GameSection'
+import LoadingSpinner from '../components/spinners/LoadingSpinner'
 import { useGame } from '../hooks/useGame'
 import { useGames } from '../hooks/useGames'
 import { useLanguage } from '../i18n/LanguageContext'
@@ -73,8 +74,7 @@ function Game() {
   if (loading && !game) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-casino-pattern px-6 text-center text-white">
-        <i className="fa-solid fa-spinner fa-spin text-3xl text-[#d91528]" aria-hidden="true" />
-        <p className="text-sm text-zinc-400">{t('Loading...')}</p>
+        <LoadingSpinner label={t('Loading...')} />
       </div>
     )
   }
@@ -185,10 +185,7 @@ function Game() {
                   </button>
                 </>
               ) : (
-                <>
-                  <i className="fa-solid fa-spinner fa-spin text-3xl text-[#d91528]" aria-hidden="true" />
-                  <p className="text-sm text-zinc-400">{t('Loading...')}</p>
-                </>
+                <LoadingSpinner label={t('Loading...')} />
               )}
             </div>
           )}

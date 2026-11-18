@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import { homeCategories } from '../../config/navigation'
 import { useBrands } from '../../hooks/useBrands'
 import { useLanguage } from '../../i18n/LanguageContext'
+import ProviderListSkeleton from '../skeletons/ProviderListSkeleton'
 
 function HomeSidebar() {
   const { t } = useLanguage()
@@ -60,13 +61,7 @@ function HomeSidebar() {
           </div>
 
           <div className="max-h-64 space-y-1 overflow-y-auto overscroll-contain pb-1 pl-1 pr-2 pt-1">
-            {loading &&
-              Array.from({ length: 6 }).map((_, index) => (
-                <div key={index} className="flex items-center gap-2.5 px-2 py-2">
-                  <span className="h-4 w-10 animate-pulse rounded bg-white/[0.06]" />
-                  <span className="h-2.5 flex-1 animate-pulse rounded bg-white/[0.04]" />
-                </div>
-              ))}
+            {loading && <ProviderListSkeleton />}
 
             {!loading && visibleBrands.length === 0 && (
               <p className="px-2 py-2 text-xs text-zinc-500">{t('No results found')}</p>

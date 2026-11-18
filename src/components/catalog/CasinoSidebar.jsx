@@ -1,6 +1,6 @@
 import { Link, useLocation, useSearchParams } from 'react-router-dom'
 
-import { CASINO_GAME_TOTAL, sidebarNav } from '../../config/navigation'
+import { sidebarNav } from '../../config/navigation'
 import { useBrands } from '../../hooks/useBrands'
 import { useLanguage } from '../../i18n/LanguageContext'
 
@@ -24,7 +24,6 @@ function CasinoSidebar({ brands: providedBrands }) {
   const hasBrandsProp = Array.isArray(providedBrands)
   const { brands: fetchedBrands } = useBrands('casino', { enabled: !hasBrandsProp })
   const brands = hasBrandsProp ? providedBrands : fetchedBrands
-  const total = CASINO_GAME_TOTAL
   const items = sidebarNav.map((item) =>
     item.label === 'Lobby' ? { ...item, to: '/casino' } : item,
   )
@@ -62,17 +61,6 @@ function CasinoSidebar({ brands: providedBrands }) {
                 <span>{t(item.label)}</span>
               </span>
 
-              {item.label === 'Lobby' && total > 0 && (
-                <span
-                  className={
-                    active
-                      ? 'rounded-md border border-red-400/30 bg-red-950/60 px-2 py-0.5 font-mono text-xs text-white'
-                      : 'rounded-md border border-white/10 bg-white/5 px-2 py-0.5 font-mono text-xs text-white'
-                  }
-                >
-                  {total.toLocaleString('en-US')}
-                </span>
-              )}
               {item.tag && (
                 <span className="rounded border border-red-500/20 bg-red-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-red-400">
                   {item.tag}

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 
-import { fetchGames, searchGames } from '../api/games'
+import { fetchGames, peekGames, searchGames } from '../api/games'
 
 function dedupeGames(items) {
   const seen = new Set()
@@ -31,12 +31,9 @@ export function useGames({
   search,
   perPage = 24,
   apiPerPage = perPage,
-  complete,
   enabled = true,
 } = {}) {
   const fetchPageSize = Math.max(apiPerPage, perPage)
-  const [state, setState] = useState(() => emptyGames(null))
-  const [loadingMore, setLoadingMore] = useState(false)
   const [nonce, setNonce] = useState(0)
   const requestKey = JSON.stringify([
     category,
@@ -48,11 +45,28 @@ export function useGames({
     fetchPageSize,
     nonce,
   ])
+  const cachedGames = enabled
+    ? peekGames({ category, type, mode, brandId, search, perPage: fetchPageSize })
+    : null
+  const [state, setState] = useState(() => {
+    if (!cachedGames) return emptyGames(null)
+
+    const items = dedupeGames(cachedGames.items)
+
+    return {
+      key: requestKey,
+      items,
+      pagination: cachedGames.pagination,
+      apiPage: 1,
+      displayCount: Math.min(perPage, items.length),
+      error: null,
+    }
+  })
+  const [loadingMore, setLoadingMore] = useState(false)
 
   useEffect(() => {
     if (!enabled) return undefined
 
-    const controller = new AbortController()
     let cancelled = false
 
     fetchGames({
@@ -63,7 +77,6 @@ export function useGames({
       search,
       page: 1,
       perPage: fetchPageSize,
-      signal: controller.signal,
     })
       .then((result) => {
         if (cancelled) return
@@ -79,7 +92,7 @@ export function useGames({
         })
       })
       .catch((requestError) => {
-        if (cancelled || requestError?.name === 'AbortError') return
+        if (cancelled) return
         setState({
           key: requestKey,
           items: [],
@@ -92,7 +105,6 @@ export function useGames({
 
     return () => {
       cancelled = true
-      controller.abort()
     }
   }, [requestKey, enabled, category, type, mode, brandId, search, perPage, fetchPageSize])
 
@@ -150,19 +162,6 @@ export function useGames({
         if (result.items.length === 0) break
       }
 
-      const total = pagination?.total ?? items.length
-      const lastPage = pagination?.last_page ?? apiPage
-
-      if (items.length < total && apiPage >= lastPage && typeof complete === 'function') {
-        const completed = await complete()
-
-        for (const game of completed) {
-          if (!game?.id || seen.has(game.id)) continue
-          seen.add(game.id)
-          items.push(game)
-        }
-      }
-
       setState((previous) => {
         if (previous.key !== requestKey) return previous
 
@@ -196,25 +195,18 @@ export function useGames({
     search,
     perPage,
     fetchPageSize,
-    complete,
   ])
 
   const reload = useCallback(() => setNonce((value) => value + 1), [])
-
-  const total = current.pagination?.total ?? current.items.length
-  const canComplete = typeof complete === 'function' && current.items.length < total
   const hasMore =
     enabled &&
     (current.displayCount < current.items.length ||
-      current.apiPage < (current.pagination?.last_page ?? current.apiPage) ||
-      canComplete)
+      current.apiPage < (current.pagination?.last_page ?? current.apiPage))
 
   return {
     games: enabled ? current.items.slice(0, current.displayCount) : [],
     loading: enabled && (state.key !== requestKey || loadingMore),
     error: enabled ? current.error : null,
-    pagination: enabled ? current.pagination : null,
-    total: enabled ? current.pagination?.total ?? current.items.length : 0,
     hasMore,
     loadMore,
     reload,
@@ -230,22 +222,20 @@ export function useGameSearch(term, { perPage = 8 } = {}) {
   useEffect(() => {
     if (!value) return undefined
 
-    const controller = new AbortController()
     let cancelled = false
 
-    searchGames(value, { perPage, signal: controller.signal })
+    searchGames(value, { perPage })
       .then((result) => {
         if (cancelled) return
         setState({ key: requestKey, games: result, error: null })
       })
       .catch((requestError) => {
-        if (cancelled || requestError?.name === 'AbortError') return
+        if (cancelled) return
         setState({ key: requestKey, games: [], error: requestError })
       })
 
     return () => {
       cancelled = true
-      controller.abort()
     }
   }, [requestKey, value, perPage])
 

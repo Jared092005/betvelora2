@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 
-import AuthShell from '../components/auth/AuthShell'
-import { useLanguage } from '../i18n/LanguageContext'
+import AuthShell from '../../components/auth/AuthShell'
+import { useLanguage } from '../../i18n/LanguageContext'
 
 const inputClass =
   'w-full rounded-xl border border-white/10 bg-[#0c0c11] px-4 py-3.5 text-sm text-white placeholder-zinc-500 focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500'

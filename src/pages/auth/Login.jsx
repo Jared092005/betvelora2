@@ -1,5 +1,7 @@
-import AuthShell from '../components/auth/AuthShell'
-import { useLanguage } from '../i18n/LanguageContext'
+import { Link } from 'react-router-dom'
+
+import AuthShell from '../../components/auth/AuthShell'
+import { useLanguage } from '../../i18n/LanguageContext'
 
 const inputClass =
   'w-full rounded-xl border border-white/10 bg-[#0c0c11] px-4 py-3.5 text-sm text-white placeholder-zinc-500 focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500'
@@ -22,9 +24,12 @@ function Login() {
         <label className="block">
           <span className="mb-2 flex items-center justify-between text-[11px] font-bold uppercase tracking-widest text-zinc-300">
             {t('Password')}
-            <button type="button" className="text-[11px] font-bold normal-case tracking-normal text-red-400 hover:text-red-300">
+            <Link
+              to="/reset-password"
+              className="text-[11px] font-bold normal-case tracking-normal text-red-400 hover:text-red-300"
+            >
               {t('Forgot?')}
-            </button>
+            </Link>
           </span>
           <input type="password" autoComplete="current-password" placeholder="••••••••" className={inputClass} />
         </label>

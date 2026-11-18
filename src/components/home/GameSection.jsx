@@ -7,7 +7,6 @@ import GamesCatalog from '../games/GamesCatalog'
 
 function GameSection({
   title,
-  count,
   badge,
   viewAll,
   games,
@@ -65,11 +64,6 @@ function GameSection({
       <div className="mb-4 flex items-center justify-between gap-3">
         <div className="flex min-w-0 items-center space-x-2">
           <h2 className="truncate text-lg font-bold tracking-wide text-white">{t(title)}</h2>
-          {count && (
-            <span className="shrink-0 rounded-full border border-white/10 bg-white/[0.05] px-2 py-0.5 text-xs text-zinc-400">
-              {count}
-            </span>
-          )}
           {badge && (
             <span className="hidden items-center gap-1.5 whitespace-nowrap rounded-full border border-red-800/40 bg-red-950/60 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-red-400 md:flex">
               <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-red-500" />

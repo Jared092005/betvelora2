@@ -1,16 +1,15 @@
 ﻿import { useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 
-import { fetchGamesByBrand } from '../../api/games'
 import { useBrands } from '../../hooks/useBrands'
 import { useGames } from '../../hooks/useGames'
 import { useLanguage } from '../../i18n/LanguageContext'
 import { useLibrary } from '../../library/LibraryContext'
 import { buildTopWinners } from '../../utils/winners'
 import GamesCatalog from '../games/GamesCatalog'
+import InfiniteScroll from '../ui/InfiniteScroll'
 import CatalogMobileFilters from './CatalogMobileFilters'
 import CatalogSidebar from './CatalogSidebar'
-import LoadMore from './LoadMore'
 import TopWinners from './TopWinners'
 
 const SIDEBAR_FILTERS = [
@@ -30,11 +29,9 @@ function CatalogPage({
   searchPlaceholder = 'Search games...',
   filters = [],
   source = {},
-  perPage = 30,
+  perPage = 24,
   sidebar = {},
   sidebarElement,
-  completeCategory,
-  totalOverride,
   live = false,
   aspect = 'aspect-[4/3]',
   favoriteSide = 'right',
@@ -75,41 +72,12 @@ function CatalogPage({
   const search = urlQuery.trim() || effectiveSource.search || ''
   const pageSize = activeFilter?.perPage ?? perPage
 
-  const complete = async () => {
-    if (!completeCategory) return []
-
-    const all = await fetchGamesByBrand(completeCategory)
-    const typeFilter = effectiveSource.type?.toLowerCase()
-    const brandFilter = brandId ? Number(brandId) : null
-    const searchTerm = search.trim().toLowerCase()
-
-    return all.filter((game) => {
-      if (brandFilter && game.providerId !== brandFilter) return false
-
-      if (typeFilter) {
-        const type = game.type?.toLowerCase() ?? ''
-        const matchesType =
-          type === typeFilter ||
-          (typeFilter === 'table_games' && (type === 'table' || type === 'table_games'))
-        if (!matchesType) return false
-      }
-
-      if (searchTerm) {
-        const haystack = `${game.name} ${game.provider} ${game.type}`.toLowerCase()
-        if (!haystack.includes(searchTerm)) return false
-      }
-
-      return true
-    })
-  }
-
-  const { games, loading, error, total, hasMore, loadMore, reload } = useGames({
+  const { games, loading, error, hasMore, loadMore, reload } = useGames({
     ...effectiveSource,
     brandId: brandId || effectiveSource.brandId || undefined,
     search: search || undefined,
     perPage: pageSize,
-    apiPerPage: 100,
-    complete: completeCategory ? complete : undefined,
+    apiPerPage: 60,
     enabled: !localList,
   })
 
@@ -157,12 +125,6 @@ function CatalogPage({
       : localList === 'recent'
         ? 'Games you open will appear here.'
         : emptyMessage
-
-  const displayTotal = totalOverride ?? total
-  const resultsLabel =
-    !isLocal && displayTotal > 0
-      ? `Showing ${shownGames.length} of ${displayTotal} available games`
-      : null
 
   const setFilterKey = (key) => {
     setQuery('')
@@ -262,11 +224,12 @@ function CatalogPage({
               emptyMessage={emptyDescription}
             />
 
-            <LoadMore
-              label={resultsLabel}
+            <InfiniteScroll
               hasMore={!isLocal && hasMore}
               loading={loading}
               onLoadMore={loadMore}
+              disabled={isLocal}
+              loadingLabel={t('Loading...')}
             />
           </section>
         </div>

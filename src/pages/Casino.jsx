@@ -1,6 +1,5 @@
 import CasinoSidebar from '../components/catalog/CasinoSidebar'
 import CatalogPage from '../components/catalog/CatalogPage'
-import { CASINO_GAME_TOTAL } from '../config/navigation'
 
 const filters = [
   { key: 'all', label: 'All games', source: { category: 'casino' } },
@@ -22,7 +21,6 @@ function Casino() {
       filters={filters}
       source={{ category: 'casino' }}
       sidebar={{ brandCategory: 'casino' }}
-      totalOverride={CASINO_GAME_TOTAL}
       sidebarElement={(brands) => <CasinoSidebar brands={brands} />}
     />
   )

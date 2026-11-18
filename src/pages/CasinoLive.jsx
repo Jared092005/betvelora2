@@ -38,7 +38,6 @@ function CasinoLive() {
       searchPlaceholder="Search live table..."
       filters={filters}
       source={{ category: 'casino_live' }}
-      perPage={30}
       sidebar={sidebar}
       live
       aspect="aspect-[16/10]"

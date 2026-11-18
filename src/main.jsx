@@ -5,6 +5,7 @@ import { HashRouter } from 'react-router-dom'
 import '@fortawesome/fontawesome-free/css/all.min.css'
 import './index.css'
 import App from './App.jsx'
+import SplashScreen from './components/spinners/SplashScreen'
 import { LanguageProvider } from './i18n/LanguageContext'
 import { LibraryProvider } from './library/LibraryContext'
 
@@ -13,7 +14,9 @@ createRoot(document.getElementById('root')).render(
     <LanguageProvider>
       <LibraryProvider>
         <HashRouter>
-          <App />
+          <SplashScreen>
+            <App />
+          </SplashScreen>
         </HashRouter>
       </LibraryProvider>
     </LanguageProvider>

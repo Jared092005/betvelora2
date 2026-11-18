@@ -100,6 +100,16 @@ const dictionary = {
   'Create account': 'Crear cuenta',
   'Already have an account?': '¿Ya tienes una cuenta?',
   'Log in': 'Iniciar sesión',
+  'Reset your password': 'Restablece tu contraseña',
+  'Enter your email address and we will send you a link to reset your password.':
+    'Ingresa tu correo electrónico y te enviaremos un enlace para restablecer tu contraseña.',
+  'Email address': 'Correo electrónico',
+  'Send reset link': 'Enviar enlace de restablecimiento',
+  'Remembered your password?': '¿Recordaste tu contraseña?',
+  'Back to Login': 'Volver al inicio de sesión',
+  'Check your email': 'Revisa tu correo',
+  'If an account exists for that email, we sent a reset link.':
+    'Si existe una cuenta con ese correo, enviamos un enlace de restablecimiento.',
   Login: 'Iniciar sesión',
   Register: 'Registrarse',
   'My Games': 'Mis juegos',

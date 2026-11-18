@@ -1,9 +1,14 @@
 import { useEffect, useState } from 'react'
 
-import { fetchGame } from '../api/games'
+import { fetchGame, peekGame } from '../api/games'
 
 export function useGame(id) {
-  const [state, setState] = useState({ id: null, game: null, loading: Boolean(id), error: null })
+  const cachedGame = id ? peekGame(id) : null
+  const [state, setState] = useState(() =>
+    cachedGame
+      ? { id, game: cachedGame, loading: false, error: null }
+      : { id: null, game: null, loading: Boolean(id), error: null },
+  )
   const [nonce, setNonce] = useState(0)
 
   useEffect(() => {

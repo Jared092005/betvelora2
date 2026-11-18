@@ -1,3 +1,4 @@
+import { cached, CACHE_TTL, peekCache } from './cache'
 import { API_BASE_URL, request } from './client'
 
 const ORIGIN = new URL(API_BASE_URL).origin
@@ -57,6 +58,32 @@ function buildGamesPath({ category, type, mode, brandId }) {
   return `/games/category/${category ?? 'casino'}`
 }
 
+export function getGamesCacheKey({
+  category,
+  type,
+  mode,
+  brandId,
+  search,
+  page = 1,
+  perPage = 24,
+}) {
+  return `games:${JSON.stringify({
+    category: category ?? '',
+    type: type ?? '',
+    mode: mode ?? '',
+    brandId: brandId ? String(brandId) : '',
+    search: search?.trim() ?? '',
+    page,
+    perPage,
+  })}`
+}
+
+export function peekGames({ category, type, mode, brandId, search, perPage = 24 }) {
+  return peekCache(
+    getGamesCacheKey({ category, type, mode, brandId, search, page: 1, perPage }),
+  )
+}
+
 export async function fetchGames({
   category,
   type,
@@ -65,130 +92,74 @@ export async function fetchGames({
   search,
   page = 1,
   perPage = 24,
-  signal,
 } = {}) {
-  const message = await request(buildGamesPath({ category, type, mode, brandId }), {
-    params: {
-      page,
-      per_page: perPage,
-      search: search?.trim() || undefined,
-      brand_id: brandId || undefined,
-    },
-    signal,
+  const term = search?.trim() ?? ''
+  const cacheKey = getGamesCacheKey({
+    category,
+    type,
+    mode,
+    brandId,
+    search: term,
+    page,
+    perPage,
   })
 
-  return {
-    items: normalizeList(message),
-    pagination: message?.pagination ?? null,
-  }
-}
-
-export async function fetchBrands(category, { signal } = {}) {
-  const path = category ? `/games/category/${category}/brands` : '/games/brands'
-  const message = await request(path, { signal })
-  const items = Array.isArray(message) ? message : message?.items ?? []
-  return items.map(normalizeBrand).filter(Boolean)
-}
-
-const CATEGORY_IDS = {
-  casino: 1,
-  casino_live: 2,
-  virtual: 3,
-  poker: 4,
-  crash: 5,
-}
-
-const brandGamesCache = new Map()
-
-async function mapWithConcurrency(items, limit, mapper) {
-  const results = new Array(items.length)
-  let index = 0
-  let failed = false
-
-  const worker = async () => {
-    while (index < items.length) {
-      const currentIndex = index
-      index += 1
-
-      try {
-        results[currentIndex] = await mapper(items[currentIndex])
-      } catch {
-        results[currentIndex] = []
-        failed = true
-      }
-    }
-  }
-
-  await Promise.all(
-    Array.from({ length: Math.min(limit, items.length) }, () => worker()),
-  )
-
-  return { results, failed }
-}
-
-async function requestBrandPage(brandId, page, signal) {
-  let lastError
-
-  for (let attempt = 0; attempt < 2; attempt += 1) {
-    try {
-      return await request(`/games/brand/${brandId}`, {
-        params: { page, per_page: 100 },
-        signal,
+  return cached(
+    cacheKey,
+    async () => {
+      const message = await request(buildGamesPath({ category, type, mode, brandId }), {
+        params: {
+          page,
+          per_page: perPage,
+          search: term || undefined,
+          brand_id: brandId || undefined,
+        },
       })
-    } catch (error) {
-      lastError = error
-      if (error?.name === 'AbortError') throw error
-      await new Promise((resolve) => setTimeout(resolve, 350))
-    }
-  }
 
-  throw lastError
+      return {
+        items: normalizeList(message),
+        pagination: message?.pagination ?? null,
+      }
+    },
+    CACHE_TTL.games,
+  )
 }
 
-export async function fetchGamesByBrand(category, { signal } = {}) {
-  const cacheKey = category ?? 'all'
-  if (brandGamesCache.has(cacheKey)) return brandGamesCache.get(cacheKey)
-
-  const brands = await fetchBrands(category, { signal })
-  const categoryId = CATEGORY_IDS[category]
-
-  const { results, failed } = await mapWithConcurrency(brands, 3, async (brand) => {
-    const games = []
-    let page = 1
-    let lastPage = 1
-
-    while (page <= lastPage) {
-      const message = await requestBrandPage(brand.id, page, signal)
-      const pageItems = Array.isArray(message) ? message : message?.items ?? []
-      games.push(...pageItems)
-      lastPage = message?.pagination?.last_page ?? 1
-      page += 1
-    }
-
-    await new Promise((resolve) => setTimeout(resolve, 100))
-    return games
-  })
-
-  const seen = new Set()
-  const items = []
-
-  for (const result of results) {
-    for (const raw of result) {
-      const game = normalizeGame(raw)
-      if (!game?.id || seen.has(game.id)) continue
-      if (categoryId && game.categoryId !== categoryId) continue
-      seen.add(game.id)
-      items.push(game)
-    }
-  }
-
-  if (!failed) brandGamesCache.set(cacheKey, items)
-  return items
+export function getBrandsCacheKey(category) {
+  return `brands:${category ?? 'all'}`
 }
 
-export async function fetchGame(id, { signal } = {}) {
-  const message = await request(`/games/${id}`, { signal })
-  return normalizeGame(message)
+export function peekBrands(category) {
+  return peekCache(getBrandsCacheKey(category))
+}
+
+export async function fetchBrands(category) {
+  const path = category ? `/games/category/${category}/brands` : '/games/brands'
+
+  return cached(
+    getBrandsCacheKey(category),
+    async () => {
+      const message = await request(path)
+      const items = Array.isArray(message) ? message : message?.items ?? []
+      return items.map(normalizeBrand).filter(Boolean)
+    },
+    CACHE_TTL.brands,
+  )
+}
+
+export function peekGame(id) {
+  return peekCache(`game:${id}`)
+}
+
+export async function fetchGame(id) {
+  return cached(
+    `game:${id}`,
+    async () => {
+      const message = await request(`/games/${id}`)
+      return normalizeGame(message)
+    },
+    CACHE_TTL.game,
+  )
 }
 
 const SEARCH_SOURCES = [
@@ -198,32 +169,38 @@ const SEARCH_SOURCES = [
   { type: 'crash' },
 ]
 
-export async function searchGames(search, { perPage = 8, signal } = {}) {
+export async function searchGames(search, { perPage = 8 } = {}) {
   const term = search?.trim()
   if (!term) return []
 
-  const results = await Promise.allSettled(
-    SEARCH_SOURCES.map((source) =>
-      fetchGames({ ...source, search: term, page: 1, perPage, signal }),
-    ),
+  return cached(
+    `search:${JSON.stringify({ term, perPage })}`,
+    async () => {
+      const results = await Promise.allSettled(
+        SEARCH_SOURCES.map((source) =>
+          fetchGames({ ...source, search: term, page: 1, perPage }),
+        ),
+      )
+
+      if (results.length > 0 && results.every((result) => result.status === 'rejected')) {
+        throw results[0].reason
+      }
+
+      const seen = new Set()
+      const games = []
+
+      results.forEach((result) => {
+        if (result.status !== 'fulfilled') return
+
+        result.value.items.forEach((game) => {
+          if (!game?.id || seen.has(game.id)) return
+          seen.add(game.id)
+          games.push(game)
+        })
+      })
+
+      return games
+    },
+    CACHE_TTL.search,
   )
-
-  if (results.length > 0 && results.every((result) => result.status === 'rejected')) {
-    throw results[0].reason
-  }
-
-  const seen = new Set()
-  const games = []
-
-  results.forEach((result) => {
-    if (result.status !== 'fulfilled') return
-
-    result.value.items.forEach((game) => {
-      if (!game?.id || seen.has(game.id)) return
-      seen.add(game.id)
-      games.push(game)
-    })
-  })
-
-  return games
 }
