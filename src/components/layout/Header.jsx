@@ -1,4 +1,4 @@
-﻿import { useRef, useState } from 'react'
+﻿import { useEffect, useRef, useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
 
 import { mainNav } from '../../config/navigation'
@@ -29,7 +29,29 @@ function Header() {
   const navRef = useRef(null)
   const dragRef = useRef({ dragging: false, startX: 0, scrollLeft: 0, moved: false })
 
-  const closeMenu = () => setMenuOpen(false)
+  const closeMenu = () => {
+    setMenuOpen(false)
+    setLanguageMenuOpen(false)
+  }
+
+  useEffect(() => {
+    if (!menuOpen) return undefined
+
+    const handleKeyDown = (event) => {
+      if (event.key !== 'Escape') return
+      setMenuOpen(false)
+      setLanguageMenuOpen(false)
+    }
+
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    window.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      document.body.style.overflow = previousOverflow
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [menuOpen])
 
   const handleDragStart = (event) => {
     dragRef.current = {
@@ -62,12 +84,12 @@ function Header() {
   return (
     <>
       <header
-        className="subtle-glass sticky top-0 z-50 flex h-16 items-center justify-between border-b border-white/[0.08] px-4 shadow-2xl backdrop-blur-md lg:px-6"
+        className="subtle-glass sticky top-0 z-50 flex h-16 items-center justify-between border-b border-white/[0.08] px-3 shadow-2xl backdrop-blur-md sm:px-4 lg:px-6"
         data-purpose="main-header"
       >
         <div className="flex min-w-0 flex-1 items-center gap-3 xl:gap-4">
           <div className="shrink-0">
-            <Logo className="h-8 sm:h-9" />
+            <Logo className="h-7 sm:h-9" />
           </div>
 
           <div className="hidden min-w-0 flex-1 items-center lg:flex">
@@ -98,7 +120,7 @@ function Header() {
           </div>
         </div>
 
-        <div className="flex shrink-0 items-center space-x-2 sm:space-x-3 lg:space-x-3" data-purpose="user-actions">
+        <div className="flex shrink-0 items-center space-x-1.5 sm:space-x-3" data-purpose="user-actions">
           <Link
             to="/account/messages"
             aria-label="Mensajes"
@@ -108,17 +130,18 @@ function Header() {
             <span className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-velora-ruby ring-2 ring-[#070709]" />
           </Link>
 
-          <div className="flex items-center rounded-full border border-white/10 bg-[#101015] py-1 pl-2.5 pr-1 shadow-inner sm:pl-3.5">
-            <div className="mr-2 flex items-center space-x-1.5 sm:mr-3 sm:space-x-2">
-              <i className="fa-solid fa-wallet text-xs text-zinc-300" aria-hidden="true" />
-              <span className="whitespace-nowrap text-[11px] font-bold tracking-wide text-white sm:text-xs">0.00 €</span>
-            </div>
+          <div className="flex items-center gap-1 sm:gap-2" data-purpose="auth-actions">
             <Link
-              to="/account/deposit"
-              className="flex items-center cursor-pointer space-x-1 rounded-full bg-gradient-to-r from-[#d91528] to-[#b30e1f] px-2.5 py-1 text-[11px] font-bold text-white shadow-md shadow-red-950/60 transition-all duration-200 hover:brightness-110 sm:px-3 sm:text-xs"
+              to="/login"
+              className="whitespace-nowrap rounded-full border border-white/15 bg-white/[0.04] px-2 py-1.5 text-[9px] font-bold uppercase tracking-wide text-zinc-200 transition duration-200 hover:border-white/30 hover:bg-white/[0.08] hover:text-white sm:px-3.5 sm:text-[11px] sm:tracking-wider"
             >
-              <i className="fa-solid fa-plus text-[10px]" aria-hidden="true" />
-              <span>{t('Add')}</span>
+              {t('Login')}
+            </Link>
+            <Link
+              to="/register"
+              className="whitespace-nowrap rounded-full bg-gradient-to-r from-[#d91528] to-[#b30e1f] px-2 py-1.5 text-[9px] font-bold uppercase tracking-wide text-white shadow-md shadow-red-950/60 transition duration-200 hover:brightness-110 sm:px-3.5 sm:text-[11px] sm:tracking-wider"
+            >
+              {t('Register')}
             </Link>
           </div>
 
@@ -181,21 +204,12 @@ function Header() {
             </svg>
           </Link>
 
-          <Link
-            to="/login"
-            aria-label="Cerrar sesión"
-            className="hidden items-center space-x-1.5 rounded-full border border-white/10 bg-white/[0.02] px-3 py-1.5 text-xs font-medium text-zinc-400 transition duration-200 hover:border-red-900/50 hover:bg-red-950/20 hover:text-red-400 lg:flex"
-          >
-            <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-            <span>{t('Logout')}</span>
-          </Link>
-
           <button
             type="button"
             onClick={() => setMenuOpen(true)}
             aria-label="Abrir menú"
+            aria-expanded={menuOpen}
+            aria-controls="mobile-menu"
             className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/[0.04] text-zinc-300 transition hover:bg-white/[0.08] hover:text-white lg:hidden"
           >
             <i className="fa-solid fa-bars" aria-hidden="true" />
@@ -203,8 +217,27 @@ function Header() {
         </div>
       </header>
 
-      {menuOpen && (
-        <div className="fixed inset-0 z-[60] flex flex-col justify-start bg-black/80 p-6 backdrop-blur-md lg:hidden">
+      <div
+        className={`fixed inset-0 z-[60] lg:hidden ${menuOpen ? 'pointer-events-auto' : 'pointer-events-none'}`}
+        aria-hidden={!menuOpen}
+      >
+        <div
+          onClick={closeMenu}
+          aria-hidden="true"
+          className={`absolute inset-0 bg-black/80 backdrop-blur-md transition-opacity duration-300 ease-out ${
+            menuOpen ? 'opacity-100' : 'opacity-0'
+          }`}
+        />
+
+        <div
+          id="mobile-menu"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Menú de navegación"
+          className={`absolute inset-y-0 right-0 flex w-[86%] max-w-sm flex-col overflow-y-auto overscroll-contain border-l border-white/10 bg-[#0a0a0d] p-6 shadow-2xl transition-transform duration-300 ease-out ${
+            menuOpen ? 'translate-x-0' : 'translate-x-full'
+          }`}
+        >
           <div className="flex items-center justify-between border-b border-white/10 pb-6">
             <Logo className="h-7" />
             <button
@@ -293,7 +326,7 @@ function Header() {
             )}
           </nav>
         </div>
-      )}
+      </div>
     </>
   )
 }
