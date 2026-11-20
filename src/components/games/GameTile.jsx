@@ -7,6 +7,7 @@ import { useLibrary } from '../../library/LibraryContext'
 function GameTile({ game, live = false, aspect = 'aspect-[4/3]', favoriteSide = 'right', from }) {
   const { t } = useLanguage()
   const [imageFailed, setImageFailed] = useState(false)
+  const [loadedImage, setLoadedImage] = useState(null)
   const { isFavorite, toggleFavorite, addRecent } = useLibrary()
   const location = useLocation()
   const resolvedFavoriteSide = live && favoriteSide === 'right' ? 'left' : favoriteSide
@@ -32,13 +33,24 @@ function GameTile({ game, live = false, aspect = 'aspect-[4/3]', favoriteSide = 
       <div className={`relative ${aspect} overflow-hidden rounded-2xl border border-white/[0.08] bg-[#181a20] shadow-md transition-all duration-300 group-hover:border-red-500/40 group-hover:shadow-[0_8px_20px_rgba(0,0,0,0.8)]`}>
         
         {game.image && !imageFailed ? (
-          <img
-            src={game.image}
-            alt={game.name}
-            loading="lazy"
-            onError={() => setImageFailed(true)}
-            className="h-full w-full object-cover transition-[scale] duration-500 group-hover:scale-105"
-          />
+          <>
+            {loadedImage !== game.image && (
+              <div
+                className="absolute inset-0 animate-pulse bg-gradient-to-br from-[#24242e] via-[#181a20] to-[#101014]"
+                aria-hidden="true"
+              />
+            )}
+            <img
+              src={game.image}
+              alt={game.name}
+              loading="lazy"
+              onLoad={() => setLoadedImage(game.image)}
+              onError={() => setImageFailed(true)}
+              className={`h-full w-full object-cover transition-[opacity,scale] duration-500 group-hover:scale-105 ${
+                loadedImage === game.image ? 'opacity-100' : 'opacity-0'
+              }`}
+            />
+          </>
         ) : (
           <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#1b1b24] to-[#0d0d12] text-2xl font-black text-white/20">
             {game.name?.slice(0, 2).toUpperCase()}

@@ -157,7 +157,7 @@ function CatalogPage({
 
       <main className="min-w-0 flex-1 px-4 py-6 lg:px-8" data-purpose="catalog-page">
         <div className="mx-auto max-w-7xl space-y-8">
-          <TopWinners items={topWinners} />
+          <TopWinners items={topWinners} loading={!isLocal && loading} />
 
           <section>
             <div className="mb-6 flex flex-col gap-4 pt-2 md:flex-row md:items-center md:justify-between">

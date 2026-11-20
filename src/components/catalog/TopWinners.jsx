@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useLanguage } from '../../i18n/LanguageContext'
 
-function TopWinners({ items = [] }) {
+function TopWinners({ items = [], loading = false }) {
   const { t } = useLanguage()
   const scrollRef = useRef(null)
   const [paused, setPaused] = useState(false)
@@ -38,7 +38,7 @@ function TopWinners({ items = [] }) {
     return () => clearInterval(interval)
   }, [paused, items.length])
 
-  if (items.length === 0) return null
+  if (items.length === 0 && !loading) return null
 
   return (
     <section
@@ -85,7 +85,7 @@ function TopWinners({ items = [] }) {
           ref={scrollRef}
           className="no-scrollbar flex snap-x snap-mandatory gap-4 overflow-x-auto overscroll-x-contain pb-2"
         >
-          {items.map((winner) => (
+          {items.length > 0 ? items.map((winner) => (
           <div
             key={`${winner.id}-${winner.game}`}
             className="group w-[85%] shrink-0 snap-start cursor-pointer rounded-2xl border border-white/[0.08] bg-[#121318] p-4 shadow-lg transition-all duration-200 hover:border-red-600/40 hover:shadow-red-950/20 sm:w-[48%] lg:w-[32%] xl:w-[23.5%]"
@@ -114,6 +114,25 @@ function TopWinners({ items = [] }) {
               </div>
             </div>
           </div>
+          )) : Array.from({ length: 8 }, (_, index) => (
+            <div
+              key={index}
+              aria-hidden="true"
+              className="w-[85%] shrink-0 snap-start animate-pulse rounded-2xl border border-white/[0.08] bg-[#121318] p-4 shadow-lg sm:w-[48%] lg:w-[32%] xl:w-[23.5%]"
+            >
+              <div className="mb-2 flex items-center justify-between">
+                <div className="h-3 w-16 rounded bg-white/[0.07]" />
+                <div className="h-3 w-14 rounded bg-white/[0.05]" />
+              </div>
+              <div className="mb-3 h-6 w-28 rounded bg-white/[0.07]" />
+              <div className="flex items-center space-x-3 border-t border-white/[0.05] pt-2">
+                <div className="h-9 w-9 shrink-0 rounded-lg bg-white/[0.07]" />
+                <div className="flex-1 space-y-2">
+                  <div className="h-3 w-3/4 rounded bg-white/[0.07]" />
+                  <div className="h-2.5 w-1/2 rounded bg-white/[0.05]" />
+                </div>
+              </div>
+            </div>
           ))}
         </div>
 
